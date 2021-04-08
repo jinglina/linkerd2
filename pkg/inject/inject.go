@@ -333,10 +333,10 @@ func (conf *ResourceConfig) GetConfigAnnotation(annotationKey string) (string, b
 // keys that are applied on the ResourceConfig's namespace. To be added, an annotation
 // must be a valid Proxy Configuration annotation
 func (conf *ResourceConfig) GetNsConfigKeys() []string {
-	var configKeys []string
-	for _, key := range ProxyAnnotations {
+	configKeys := make([]string, len(ProxyAnnotations))
+	for i, key := range ProxyAnnotations {
 		if _, ok := conf.nsAnnotations[key]; ok {
-			configKeys = append(configKeys, key)
+			configKeys[i] = key
 		}
 	}
 	return configKeys
