@@ -306,27 +306,40 @@ func (conf *ResourceConfig) GetPodPatch(injectProxy bool) ([]byte, error) {
 	return res, nil
 }
 
-// GetOpaquePorts returns two values. The first value is the the opaque ports
-// annotation value. The second is used to decide whether or not the caller
+// GetConfigAnnotation returns two values. The first value is the the annotation
+// value for a given key. The second is used to decide whether or not the caller
 // should add the annotation. The caller should not add the annotation if the
 // resource already has its own.
-func (conf *ResourceConfig) GetOpaquePorts() (string, bool) {
-	_, ok := conf.pod.meta.Annotations[k8s.ProxyOpaquePortsAnnotation]
+func (conf *ResourceConfig) GetConfigAnnotation(annotationKey string) (string, bool) {
+	_, ok := conf.pod.meta.Annotations[annotationKey]
 	if ok {
-		log.Debugf("using pod %s %s annotation value", conf.pod.meta.Name, k8s.ProxyOpaquePortsAnnotation)
+		log.Debugf("using pod %s %s annotation value", conf.pod.meta.Name, annotationKey)
 		return "", false
 	}
-	_, ok = conf.workload.Meta.Annotations[k8s.ProxyOpaquePortsAnnotation]
+	_, ok = conf.workload.Meta.Annotations[annotationKey]
 	if ok {
-		log.Debugf("using service %s %s annotation value", conf.workload.Meta.Name, k8s.ProxyOpaquePortsAnnotation)
+		log.Debugf("using service %s %s annotation value", conf.workload.Meta.Name, annotationKey)
 		return "", false
 	}
-	annotation, ok := conf.nsAnnotations[k8s.ProxyOpaquePortsAnnotation]
+	annotation, ok := conf.nsAnnotations[annotationKey]
 	if ok {
-		log.Debugf("using namespace %s %s annotation value", conf.workload.Meta.Namespace, k8s.ProxyOpaquePortsAnnotation)
+		log.Debugf("using namespace %s %s annotation value", conf.workload.Meta.Namespace, annotationKey)
 		return annotation, true
 	}
 	return "", false
+}
+
+// GetNsConfigKeys returns a string slice representing configuration annotation
+// keys that are applied on the ResourceConfig's namespace. To be added, an annotation
+// must be a valid Proxy Configuration annotation
+func (conf *ResourceConfig) GetNsConfigKeys() []string {
+	var configKeys []string
+	for _, key := range ProxyAnnotations {
+		if _, ok := conf.nsAnnotations[key]; ok {
+			configKeys = append(configKeys, key)
+		}
+	}
+	return configKeys
 }
 
 // CreateAnnotationPatch returns a json patch which adds the opaque ports

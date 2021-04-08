@@ -78,7 +78,7 @@ func Inject(
 
 	// If the pod's namespace has the opaque ports annotation but the pod does
 	// not, then it should be added to the pod template metadata.
-	opaquePorts, opaquePortsOk := resourceConfig.GetOpaquePorts()
+	opaquePorts, opaquePortsOk := resourceConfig.GetConfigAnnotation(pkgK8s.ProxyOpaquePortsAnnotation)
 	if resourceConfig.IsPod() && opaquePortsOk {
 		resourceConfig.AppendPodAnnotation(pkgK8s.ProxyOpaquePortsAnnotation, opaquePorts)
 	}
@@ -88,6 +88,15 @@ func Inject(
 	injectable, reasons := report.Injectable()
 	if injectable {
 		resourceConfig.AppendPodAnnotation(pkgK8s.CreatedByAnnotation, fmt.Sprintf("linkerd/proxy-injector %s", version.Version))
+		// Get all config annotations applied to the namespace
+		// and add them to the pod spec if inexistent
+		configAnnotations := resourceConfig.GetNsConfigKeys()
+		for _, configKey := range configAnnotations {
+			if configValue, configOk := resourceConfig.GetConfigAnnotation(configKey); configOk {
+				resourceConfig.AppendPodAnnotation(configKey, configValue)
+			}
+		}
+
 		patchJSON, err := resourceConfig.GetPodPatch(true)
 		if err != nil {
 			return nil, err
