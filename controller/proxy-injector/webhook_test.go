@@ -206,12 +206,7 @@ func TestGetPodPatch(t *testing.T) {
 
 		// The namespace has two config annotations: one valid and one invalid
 		// the pod patch should only contain the valid annotation.
-		nsConfigKeys := conf.GetNsConfigKeys()
-		for _, key := range nsConfigKeys {
-			if val, ok := conf.GetConfigAnnotation(key); ok {
-				conf.AppendPodAnnotation(key, val)
-			}
-		}
+		conf.AppendNamespaceAnnotations()
 		patchJSON, err := conf.GetPodPatch(true)
 		if err != nil {
 			t.Fatalf("Unexpected PatchForAdmissionRequest error: %s", err)
