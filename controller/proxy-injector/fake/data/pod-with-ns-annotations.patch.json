@@ -1,6 +1,11 @@
 [
   {
     "op": "add",
+    "path": "/metadata/annotations/config.alpha.linkerd.io~1proxy-wait-before-exit-seconds",
+    "value": "300"
+  },
+  {
+    "op": "add",
     "path": "/metadata/annotations/config.linkerd.io~1skip-outbound-ports",
     "value": "34567"
   },
