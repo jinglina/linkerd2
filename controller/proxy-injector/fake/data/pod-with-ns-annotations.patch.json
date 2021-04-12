@@ -63,7 +63,7 @@
         "--outbound-ports-to-ignore",
         "34567"
       ],
-      "image": "cr.l5d.io/linkerd/proxy-init:v1.3.9",
+      "image": "cr.l5d.io/linkerd/proxy-init:v1.3.11",
       "imagePullPolicy": "IfNotPresent",
       "name": "linkerd-init",
       "resources": {
@@ -186,6 +186,17 @@
       ],
       "image": "cr.l5d.io/linkerd/proxy:dev-undefined",
       "imagePullPolicy": "IfNotPresent",
+      "lifecycle": {
+        "preStop": {
+          "exec": {
+            "command": [
+              "/bin/bash",
+              "-c",
+              "sleep 300"
+            ]
+          }
+        }
+      },
       "livenessProbe": {
         "httpGet": {
           "path": "/live",

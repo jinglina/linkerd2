@@ -53,9 +53,10 @@ func confNsWithConfigAnnotations() *inject.ResourceConfig {
 	return inject.
 		NewResourceConfig(values, inject.OriginWebhook).
 		WithNsAnnotations(map[string]string{
-			pkgK8s.ProxyInjectAnnotation:              pkgK8s.ProxyInjectEnabled,
-			pkgK8s.ProxyIgnoreOutboundPortsAnnotation: "34567",
-			"config.linkerd.io/invalid-key":           "invalid-value",
+			pkgK8s.ProxyInjectAnnotation:                pkgK8s.ProxyInjectEnabled,
+			pkgK8s.ProxyIgnoreOutboundPortsAnnotation:   "34567",
+			pkgK8s.ProxyWaitBeforeExitSecondsAnnotation: "300",
+			"config.linkerd.io/invalid-key":             "invalid-value",
 		})
 }
 func TestGetPodPatch(t *testing.T) {
